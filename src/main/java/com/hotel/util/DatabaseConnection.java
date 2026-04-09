@@ -31,7 +31,8 @@ public class DatabaseConnection {
                 CREATE TABLE IF NOT EXISTS Customer (
                     name TEXT,
                     contact TEXT,
-                    roomAssigned TEXT
+                    roomAssigned TEXT,
+                    totalBill REAL DEFAULT 0
                 )
                 """;
 
@@ -40,7 +41,8 @@ public class DatabaseConnection {
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     customerName TEXT,
                     roomNumber TEXT,
-                    status TEXT
+                    status TEXT,
+                    totalBill REAL DEFAULT 0
                 )
                 """;
 
@@ -49,8 +51,21 @@ public class DatabaseConnection {
             statement.execute(createRoomTable);
             statement.execute(createCustomerTable);
             statement.execute(createBookingTable);
+            addColumnIfMissing(statement, "ALTER TABLE Customer ADD COLUMN totalBill REAL DEFAULT 0");
+            addColumnIfMissing(statement, "ALTER TABLE Booking ADD COLUMN totalBill REAL DEFAULT 0");
         } catch (SQLException exception) {
             throw new RuntimeException("Unable to initialize database tables.", exception);
+        }
+    }
+
+    private static void addColumnIfMissing(Statement statement, String alterStatement) {
+        try {
+            statement.execute(alterStatement);
+        } catch (SQLException exception) {
+            String message = exception.getMessage();
+            if (message == null || !message.toLowerCase().contains("duplicate column")) {
+                throw new RuntimeException("Unable to update database schema.", exception);
+            }
         }
     }
 }

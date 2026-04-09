@@ -33,7 +33,12 @@ public class BookingService {
         }
 
         String checkBooking = "SELECT COUNT(*) FROM Booking WHERE roomNumber = ? AND status = ?";
-        String insertBooking = "INSERT INTO Booking (customerName, roomNumber, status) VALUES (?, ?, ?)";
+        String insertBooking = "INSERT INTO Booking (customerName, roomNumber, status, totalBill) VALUES (?, ?, ?, ?)";
+        Double totalBill = customer.getTotalBill();
+
+        if (totalBill == null) {
+            totalBill = room.getPrice() * numberOfDays;
+        }
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement checkStatement = connection.prepareStatement(checkBooking);
@@ -50,9 +55,10 @@ public class BookingService {
             insertStatement.setString(1, customer.getName());
             insertStatement.setString(2, room.getRoomNumber());
             insertStatement.setString(3, "Active");
+            insertStatement.setDouble(4, totalBill);
             insertStatement.executeUpdate();
 
-            Booking booking = new Booking(0, customer, room, startDate, endDate, numberOfDays, 0.0, true);
+            Booking booking = new Booking(0, customer, room, startDate, endDate, numberOfDays, 0.0, totalBill, true);
             saveBookingToFile(booking);
             roomService.updateRoomAvailability(room.getRoomNumber(), false);
             return true;
@@ -89,7 +95,7 @@ public class BookingService {
         ArrayList<Booking> bookings = new ArrayList<>();
         List<Customer> customers = customerService.getAllCustomers();
         List<Room> rooms = roomService.getAllRooms();
-        String selectBookings = "SELECT id, customerName, roomNumber, status FROM Booking";
+        String selectBookings = "SELECT id, customerName, roomNumber, status, totalBill FROM Booking";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(selectBookings);
@@ -113,6 +119,7 @@ public class BookingService {
                         LocalDate.now().plusDays(1),
                         1,
                         0.0,
+                        resultSet.getDouble("totalBill"),
                         "Active".equalsIgnoreCase(resultSet.getString("status"))
                 );
                 bookings.add(booking);

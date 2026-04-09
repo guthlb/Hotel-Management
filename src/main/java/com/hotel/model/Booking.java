@@ -11,13 +11,14 @@ public class Booking {
     private LocalDate checkOutDate;
     private int numberOfDays;
     private double serviceCharge;
+    private Double totalBill;
     private boolean active;
 
     public Booking() {
     }
 
     public Booking(int bookingId, Customer customer, Room room, LocalDate checkInDate,
-                   LocalDate checkOutDate, int numberOfDays, double serviceCharge, boolean active) {
+                   LocalDate checkOutDate, int numberOfDays, double serviceCharge, Double totalBill, boolean active) {
         this.bookingId = bookingId;
         this.customer = customer;
         this.room = room;
@@ -25,6 +26,7 @@ public class Booking {
         this.checkOutDate = checkOutDate;
         this.numberOfDays = numberOfDays;
         this.serviceCharge = serviceCharge;
+        this.totalBill = totalBill;
         this.active = active;
     }
 
@@ -84,6 +86,14 @@ public class Booking {
         this.serviceCharge = serviceCharge;
     }
 
+    public Double getTotalBill() {
+        return totalBill;
+    }
+
+    public void setTotalBill(Double totalBill) {
+        this.totalBill = totalBill;
+    }
+
     public boolean isActive() {
         return active;
     }
@@ -93,6 +103,9 @@ public class Booking {
     }
 
     public double calculateTotalBill() {
+        if (totalBill != null) {
+            return totalBill;
+        }
         return (room.getPrice() * numberOfDays) + serviceCharge;
     }
 
@@ -106,6 +119,7 @@ public class Booking {
                 ", checkOutDate=" + checkOutDate +
                 ", numberOfDays=" + numberOfDays +
                 ", serviceCharge=" + serviceCharge +
+                ", totalBill=" + totalBill +
                 ", active=" + active +
                 '}';
     }

@@ -18,6 +18,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
 import java.time.LocalDate;
@@ -41,6 +42,15 @@ public class BookingController {
     private Label bookingDaysLabel;
 
     @FXML
+    private Label roomPriceLabel;
+
+    @FXML
+    private TextField serviceChargeField;
+
+    @FXML
+    private Label calculatedBillLabel;
+
+    @FXML
     private TableView<Booking> bookingTableView;
 
     @FXML
@@ -59,6 +69,7 @@ public class BookingController {
     private final CustomerService customerService = new CustomerService();
     private final RoomService roomService = new RoomService();
     private final BookingService bookingService = new BookingService();
+    private Double calculatedBillAmount;
 
     @FXML
     public void initialize() {
@@ -105,6 +116,15 @@ public class BookingController {
     }
 
     @FXML
+    public void handleRoomSelection() {
+        Room room = roomComboBox.getValue();
+        roomPriceLabel.setText(room == null
+                ? "Rs. 0.00 per day"
+                : String.format("Rs. %.2f per day", room.getPrice()));
+        updateBillPreview();
+    }
+
+    @FXML
     public void handleCreateBooking() {
         Customer customer = customerComboBox.getValue();
         Room room = roomComboBox.getValue();
@@ -117,19 +137,31 @@ public class BookingController {
             return;
         }
 
+        if (calculatedBillAmount == null) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please calculate the bill before creating the booking.");
+            return;
+        }
+
+        customer.setAssignedRoomNumber(room.getRoomNumber());
+        customer.setTotalBill(calculatedBillAmount);
+
         boolean created = bookingService.createBooking(customer, room, startDate, endDate, (int) numberOfDays);
         if (!created) {
             showAlert(Alert.AlertType.ERROR, "Booking Error", "Room is already booked or unavailable.");
             return;
         }
 
-        roomService.updateRoomAvailability(room.getRoomNumber(), false);
+        customerService.updateCustomerBookingDetails(customer.getCustomerId(), room.getRoomNumber(), calculatedBillAmount);
         refreshData();
         customerComboBox.setValue(null);
         roomComboBox.setValue(null);
         startDatePicker.setValue(null);
         endDatePicker.setValue(null);
+        serviceChargeField.clear();
         bookingDaysLabel.setText("0");
+        roomPriceLabel.setText("Rs. 0.00 per day");
+        calculatedBillAmount = null;
+        calculatedBillLabel.setText("Calculated Bill: Rs. 0.00");
         showAlert(Alert.AlertType.INFORMATION, "Success", "Booking created successfully.");
     }
 
@@ -137,6 +169,30 @@ public class BookingController {
     public void handleDateSelection() {
         long numberOfDays = calculateDays();
         bookingDaysLabel.setText(String.valueOf(numberOfDays));
+        updateBillPreview();
+    }
+
+    @FXML
+    public void calculateBill() {
+        Room room = roomComboBox.getValue();
+        long numberOfDays = calculateDays();
+
+        if (room == null || numberOfDays < 1) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please select a room and valid dates before calculating the bill.");
+            return;
+        }
+
+        double serviceCharge;
+        try {
+            String serviceChargeText = serviceChargeField.getText().trim();
+            serviceCharge = serviceChargeText.isEmpty() ? 0.0 : Double.parseDouble(serviceChargeText);
+        } catch (NumberFormatException exception) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Service charge must be a valid number.");
+            return;
+        }
+
+        calculatedBillAmount = (room.getPrice() * numberOfDays) + serviceCharge;
+        calculatedBillLabel.setText(String.format("Calculated Bill: Rs. %.2f", calculatedBillAmount));
     }
 
     @FXML
@@ -179,6 +235,11 @@ public class BookingController {
         return Math.max(days, 0);
     }
 
+    private void updateBillPreview() {
+        calculatedBillAmount = null;
+        calculatedBillLabel.setText("Calculated Bill: Rs. 0.00");
+    }
+
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
@@ -205,10 +266,5 @@ public class BookingController {
     public void openBookings(ActionEvent event) {
         System.out.println("Bookings button clicked");
         SceneSwitcher.switchScene(event, "/fxml/booking.fxml", "Booking Management");
-    }
-
-    public void openBilling(ActionEvent event) {
-        System.out.println("Billing button clicked");
-        SceneSwitcher.switchScene(event, "/fxml/billing.fxml", "Billing");
     }
 }

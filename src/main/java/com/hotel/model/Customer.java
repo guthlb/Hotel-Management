@@ -6,15 +6,17 @@ public class Customer {
     private String name;
     private String contact;
     private String assignedRoomNumber;
+    private Double totalBill;
 
     public Customer() {
     }
 
-    public Customer(int customerId, String name, String contact, String assignedRoomNumber) {
+    public Customer(int customerId, String name, String contact, String assignedRoomNumber, Double totalBill) {
         this.customerId = customerId;
         this.name = name;
         this.contact = contact;
         this.assignedRoomNumber = assignedRoomNumber;
+        this.totalBill = totalBill;
     }
 
     public int getCustomerId() {
@@ -49,6 +51,14 @@ public class Customer {
         this.assignedRoomNumber = assignedRoomNumber;
     }
 
+    public Double getTotalBill() {
+        return totalBill;
+    }
+
+    public void setTotalBill(Double totalBill) {
+        this.totalBill = totalBill;
+    }
+
     @Override
     public String toString() {
         return "Customer{" +
@@ -56,6 +66,7 @@ public class Customer {
                 ", name='" + name + '\'' +
                 ", contact='" + contact + '\'' +
                 ", assignedRoomNumber='" + assignedRoomNumber + '\'' +
+                ", totalBill=" + totalBill +
                 '}';
     }
 }

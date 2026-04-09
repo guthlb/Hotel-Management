@@ -29,7 +29,6 @@
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openRooms" prefHeight="42.0" styleClass="sidebar-button-active" text="Rooms" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openCustomers" prefHeight="42.0" styleClass="sidebar-button" text="Customers" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openBookings" prefHeight="42.0" styleClass="sidebar-button" text="Bookings" />
-                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openBilling" prefHeight="42.0" styleClass="sidebar-button" text="Billing" />
             </VBox>
             <Region VBox.vgrow="ALWAYS" />
         </VBox>

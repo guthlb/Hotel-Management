@@ -39,6 +39,9 @@ public class CustomerController {
     @FXML
     private TableColumn<Customer, String> roomAssignedColumn;
 
+    @FXML
+    private TableColumn<Customer, Double> totalBillColumn;
+
     private final ObservableList<Customer> customerObservableList = FXCollections.observableArrayList();
     private final CustomerService customerService = new CustomerService();
 
@@ -48,6 +51,7 @@ public class CustomerController {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         contactColumn.setCellValueFactory(new PropertyValueFactory<>("contact"));
         roomAssignedColumn.setCellValueFactory(new PropertyValueFactory<>("assignedRoomNumber"));
+        totalBillColumn.setCellValueFactory(new PropertyValueFactory<>("totalBill"));
 
         customerTableView.setItems(customerObservableList);
         loadCustomers();
@@ -64,7 +68,7 @@ public class CustomerController {
             return;
         }
 
-        customerService.addCustomer(name, contact, roomAssigned);
+        customerService.addCustomer(name, contact, roomAssigned, 0.0);
         loadCustomers();
 
         clearForm();
@@ -107,10 +111,5 @@ public class CustomerController {
     public void openBookings(ActionEvent event) {
         System.out.println("Bookings button clicked");
         SceneSwitcher.switchScene(event, "/fxml/booking.fxml", "Booking Management");
-    }
-
-    public void openBilling(ActionEvent event) {
-        System.out.println("Billing button clicked");
-        SceneSwitcher.switchScene(event, "/fxml/billing.fxml", "Billing");
     }
 }

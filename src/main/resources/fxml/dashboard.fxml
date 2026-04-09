@@ -28,7 +28,6 @@
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openRooms" prefHeight="42.0" styleClass="sidebar-button" text="Rooms" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openCustomers" prefHeight="42.0" styleClass="sidebar-button" text="Customers" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openBookings" prefHeight="42.0" styleClass="sidebar-button" text="Bookings" />
-                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openBilling" prefHeight="42.0" styleClass="sidebar-button" text="Billing" />
             </VBox>
 
             <Region VBox.vgrow="ALWAYS" />
@@ -38,7 +37,7 @@
                 <Label styleClass="sidebar-subtitle" text="• Room management" />
                 <Label styleClass="sidebar-subtitle" text="• Customer records" />
                 <Label styleClass="sidebar-subtitle" text="• Booking and checkout" />
-                <Label styleClass="sidebar-subtitle" text="• Billing calculation" />
+                <Label styleClass="sidebar-subtitle" text="• Customer billing" />
             </VBox>
         </VBox>
     </left>
@@ -51,8 +50,8 @@
 
             <HBox alignment="CENTER_LEFT">
                 <VBox spacing="4.0">
-                    <Label styleClass="page-title" text="Home Dashboard" />
-                    <Label styleClass="page-subtitle" text="Use the quick actions below to manage rooms, customers, bookings, and billing." />
+                <Label styleClass="page-title" text="Home Dashboard" />
+                    <Label styleClass="page-subtitle" text="Use the quick actions below to manage rooms, customers, bookings, and customer billing." />
                     <HBox spacing="18.0">
                         <Label fx:id="totalRoomsLabel" styleClass="summary-label" text="Total Rooms: 0" />
                         <Label fx:id="availableRoomsLabel" styleClass="summary-label" text="Available Rooms: 0" />
@@ -72,7 +71,7 @@
                     <Button mnemonicParsing="false" onAction="#openRooms" prefHeight="46.0" prefWidth="180.0" styleClass="quick-action-button" text="Add Room" />
                     <Button mnemonicParsing="false" onAction="#openCustomers" prefHeight="46.0" prefWidth="180.0" styleClass="quick-action-button" text="Add Customer" GridPane.columnIndex="1" />
                     <Button mnemonicParsing="false" onAction="#openBookings" prefHeight="46.0" prefWidth="180.0" styleClass="quick-action-button" text="Create Booking" GridPane.rowIndex="1" />
-                    <Button mnemonicParsing="false" onAction="#openBilling" prefHeight="46.0" prefWidth="180.0" styleClass="quick-action-button" text="Generate Bill" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <Button mnemonicParsing="false" onAction="#openCustomers" prefHeight="46.0" prefWidth="180.0" styleClass="quick-action-button" text="Customer Billing" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                 </GridPane>
             </VBox>
         </VBox>

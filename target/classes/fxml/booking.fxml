@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -28,7 +29,6 @@
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openRooms" prefHeight="42.0" styleClass="sidebar-button" text="Rooms" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openCustomers" prefHeight="42.0" styleClass="sidebar-button" text="Customers" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openBookings" prefHeight="42.0" styleClass="sidebar-button-active" text="Bookings" />
-                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openBilling" prefHeight="42.0" styleClass="sidebar-button" text="Billing" />
             </VBox>
             <Region VBox.vgrow="ALWAYS" />
         </VBox>
@@ -60,7 +60,7 @@
                     <ComboBox fx:id="customerComboBox" prefWidth="220.0" GridPane.columnIndex="1" />
 
                     <Label text="Select Room" GridPane.columnIndex="2" />
-                    <ComboBox fx:id="roomComboBox" prefWidth="220.0" GridPane.columnIndex="3" />
+                    <ComboBox fx:id="roomComboBox" onAction="#handleRoomSelection" prefWidth="220.0" GridPane.columnIndex="3" />
 
                     <Label text="Start Date" GridPane.rowIndex="1" />
                     <DatePicker fx:id="startDatePicker" onAction="#handleDateSelection" GridPane.columnIndex="1" GridPane.rowIndex="1" />
@@ -70,10 +70,19 @@
 
                     <Label text="Number of Days" GridPane.rowIndex="2" />
                     <Label fx:id="bookingDaysLabel" styleClass="summary-label" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                    <Label text="Room Price" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                    <Label fx:id="roomPriceLabel" styleClass="summary-label" text="Rs. 0.00 per day" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+
+                    <Label text="Service Charges" GridPane.rowIndex="3" />
+                    <TextField fx:id="serviceChargeField" promptText="Optional service charge" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                    <Label fx:id="calculatedBillLabel" styleClass="summary-label" text="Calculated Bill: Rs. 0.00" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                 </GridPane>
 
                 <HBox alignment="CENTER_RIGHT" spacing="10.0">
                     <Region HBox.hgrow="ALWAYS" />
+                    <Button mnemonicParsing="false" onAction="#calculateBill" prefHeight="40.0" prefWidth="140.0" styleClass="action-button" text="Calculate Bill" />
                     <Button mnemonicParsing="false" onAction="#handleCreateBooking" prefHeight="40.0" prefWidth="150.0" styleClass="action-button" text="Create Booking" />
                     <Button mnemonicParsing="false" onAction="#handleCheckout" prefHeight="40.0" prefWidth="130.0" styleClass="action-button" text="Checkout" />
                 </HBox>

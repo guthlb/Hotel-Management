@@ -79,9 +79,4 @@ public class DashboardController {
         System.out.println("Bookings button clicked");
         SceneSwitcher.switchScene(event, "/fxml/booking.fxml", "Booking Management");
     }
-
-    public void openBilling(ActionEvent event) {
-        System.out.println("Billing button clicked");
-        SceneSwitcher.switchScene(event, "/fxml/billing.fxml", "Billing");
-    }
 }
