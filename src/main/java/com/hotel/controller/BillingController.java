@@ -7,10 +7,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class BillingController {
@@ -19,10 +22,16 @@ public class BillingController {
     private ComboBox<Room> roomComboBox;
 
     @FXML
-    private TextField daysField;
+    private DatePicker startDatePicker;
+
+    @FXML
+    private DatePicker endDatePicker;
 
     @FXML
     private TextField serviceChargeField;
+
+    @FXML
+    private Label daysLabel;
 
     @FXML
     private Label selectedRoomLabel;
@@ -34,7 +43,6 @@ public class BillingController {
 
     @FXML
     public void initialize() {
-        roomService.loadFromFile();
         List<Room> rooms = roomService.getAllRooms();
         roomComboBox.getItems().setAll(rooms);
 
@@ -57,11 +65,11 @@ public class BillingController {
     @FXML
     public void calculateBill() {
         Room selectedRoom = roomComboBox.getValue();
-        String daysText = daysField.getText().trim();
         String serviceChargeText = serviceChargeField.getText().trim();
+        long calculatedDays = calculateDays();
 
-        if (selectedRoom == null || daysText.isEmpty() || serviceChargeText.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please select a room and enter all values.");
+        if (selectedRoom == null || calculatedDays < 1 || serviceChargeText.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please select a room, valid dates, and service charge.");
             return;
         }
 
@@ -70,10 +78,10 @@ public class BillingController {
         Double totalBill;
 
         try {
-            numberOfDays = Integer.valueOf(daysText);
+            numberOfDays = Integer.valueOf((int) calculatedDays);
             serviceCharge = Double.valueOf(serviceChargeText);
         } catch (NumberFormatException exception) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Days and service charge must be valid numbers.");
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Service charge must be a valid number.");
             return;
         }
 
@@ -81,6 +89,24 @@ public class BillingController {
 
         selectedRoomLabel.setText("Selected room: " + selectedRoom.getRoomNumber() + " (" + selectedRoom.getRoomType() + ")");
         totalBillLabel.setText(String.format("Total Bill: Rs. %.2f", totalBill));
+    }
+
+    @FXML
+    public void handleDateSelection() {
+        long numberOfDays = calculateDays();
+        daysLabel.setText(String.valueOf(numberOfDays));
+    }
+
+    private long calculateDays() {
+        LocalDate startDate = startDatePicker.getValue();
+        LocalDate endDate = endDatePicker.getValue();
+
+        if (startDate == null || endDate == null) {
+            return 0;
+        }
+
+        long days = ChronoUnit.DAYS.between(startDate, endDate);
+        return Math.max(days, 0);
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {

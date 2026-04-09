@@ -1,0 +1,11 @@
+----------------------------------------
+Booking Record
+Customer Name: Diya moogi
+Room Number: 231
+Room Type: Double
+Price per Day: 2500.0
+Start Date: 2026-04-10
+End Date (Checkout): 2026-04-30
+Total Days: 20
+Total Bill: 50000.0
+----------------------------------------

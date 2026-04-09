@@ -4,6 +4,7 @@ import com.hotel.model.Room;
 import com.hotel.service.CustomerService;
 import com.hotel.service.RoomService;
 import com.hotel.util.SceneSwitcher;
+import com.hotel.util.ThemeManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -34,9 +35,13 @@ public class DashboardController {
         System.out.println("Refreshed");
     }
 
-    private void loadDashboardData() {
-        roomService.loadFromFile();
+    @FXML
+    public void toggleTheme() {
+        ThemeManager.toggleTheme();
+        ThemeManager.applyTheme(totalRoomsLabel.getScene());
+    }
 
+    private void loadDashboardData() {
         ArrayList<Room> allRooms = new ArrayList<>(roomService.getAllRooms());
         ArrayList<Room> availableRooms = new ArrayList<>();
 

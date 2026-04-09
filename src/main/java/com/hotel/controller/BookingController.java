@@ -14,9 +14,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.StringConverter;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 public class BookingController {
 
@@ -25,6 +30,15 @@ public class BookingController {
 
     @FXML
     private ComboBox<Room> roomComboBox;
+
+    @FXML
+    private DatePicker startDatePicker;
+
+    @FXML
+    private DatePicker endDatePicker;
+
+    @FXML
+    private Label bookingDaysLabel;
 
     @FXML
     private TableView<Booking> bookingTableView;
@@ -94,13 +108,16 @@ public class BookingController {
     public void handleCreateBooking() {
         Customer customer = customerComboBox.getValue();
         Room room = roomComboBox.getValue();
+        LocalDate startDate = startDatePicker.getValue();
+        LocalDate endDate = endDatePicker.getValue();
+        long numberOfDays = calculateDays();
 
-        if (customer == null || room == null) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please select both customer and room.");
+        if (customer == null || room == null || startDate == null || endDate == null || numberOfDays < 1) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please select customer, room, and valid dates.");
             return;
         }
 
-        boolean created = bookingService.createBooking(customer, room);
+        boolean created = bookingService.createBooking(customer, room, startDate, endDate, (int) numberOfDays);
         if (!created) {
             showAlert(Alert.AlertType.ERROR, "Booking Error", "Room is already booked or unavailable.");
             return;
@@ -110,7 +127,16 @@ public class BookingController {
         refreshData();
         customerComboBox.setValue(null);
         roomComboBox.setValue(null);
+        startDatePicker.setValue(null);
+        endDatePicker.setValue(null);
+        bookingDaysLabel.setText("0");
         showAlert(Alert.AlertType.INFORMATION, "Success", "Booking created successfully.");
+    }
+
+    @FXML
+    public void handleDateSelection() {
+        long numberOfDays = calculateDays();
+        bookingDaysLabel.setText(String.valueOf(numberOfDays));
     }
 
     @FXML
@@ -134,12 +160,23 @@ public class BookingController {
     }
 
     private void refreshData() {
-        roomService.loadFromFile();
         customerComboBox.setItems(FXCollections.observableArrayList(customerService.getAllCustomers()));
         roomComboBox.setItems(FXCollections.observableArrayList(roomService.getAllRooms().stream()
                 .filter(Room::isAvailable)
                 .toList()));
         bookingObservableList.setAll(bookingService.getAllBookings());
+    }
+
+    private long calculateDays() {
+        LocalDate startDate = startDatePicker.getValue();
+        LocalDate endDate = endDatePicker.getValue();
+
+        if (startDate == null || endDate == null) {
+            return 0;
+        }
+
+        long days = ChronoUnit.DAYS.between(startDate, endDate);
+        return Math.max(days, 0);
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {

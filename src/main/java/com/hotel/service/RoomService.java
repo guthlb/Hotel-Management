@@ -1,103 +1,65 @@
 package com.hotel.service;
 
 import com.hotel.model.Room;
+import com.hotel.util.DatabaseConnection;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class RoomService {
 
-    private static final String DATA_FOLDER = "data";
-    private static final String ROOM_FILE = DATA_FOLDER + "/rooms.txt";
-
-    private final ArrayList<Room> rooms = new ArrayList<>();
-
-    public RoomService() {
-        createFileIfNeeded();
-        loadFromFile();
-    }
-
     public void addRoom(Room room) {
-        rooms.add(room);
-        saveToFile();
+        String insertRoom = "INSERT INTO Room (roomNumber, type, price, availability) VALUES (?, ?, ?, ?)";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(insertRoom)) {
+            statement.setString(1, room.getRoomNumber());
+            statement.setString(2, room.getRoomType());
+            statement.setDouble(3, room.getPrice());
+            statement.setInt(4, room.isAvailable() ? 1 : 0);
+            statement.executeUpdate();
+        } catch (SQLException exception) {
+            throw new RuntimeException("Unable to add room to database.", exception);
+        }
     }
 
     public void updateRoomAvailability(String roomNumber, boolean available) {
-        for (Room room : rooms) {
-            if (room.getRoomNumber().equalsIgnoreCase(roomNumber)) {
-                room.setAvailable(available);
-                break;
-            }
+        String updateRoom = "UPDATE Room SET availability = ? WHERE roomNumber = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(updateRoom)) {
+            statement.setInt(1, available ? 1 : 0);
+            statement.setString(2, roomNumber);
+            statement.executeUpdate();
+        } catch (SQLException exception) {
+            throw new RuntimeException("Unable to update room availability.", exception);
         }
-        saveToFile();
     }
 
     public List<Room> getAllRooms() {
-        return new ArrayList<>(rooms);
-    }
+        ArrayList<Room> rooms = new ArrayList<>();
+        String selectRooms = "SELECT roomNumber, type, price, availability FROM Room";
 
-    public void saveToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ROOM_FILE))) {
-            for (Room room : rooms) {
-                writer.write(room.getRoomNumber() + "," +
-                        room.getRoomType() + "," +
-                        room.getPrice() + "," +
-                        room.isAvailable());
-                writer.newLine();
-            }
-        } catch (IOException exception) {
-            throw new RuntimeException("Unable to save rooms to file.", exception);
-        }
-    }
-
-    public void loadFromFile() {
-        rooms.clear();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(ROOM_FILE))) {
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                if (line.isBlank()) {
-                    continue;
-                }
-
-                String[] data = line.split(",");
-                if (data.length != 4) {
-                    continue;
-                }
-
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(selectRooms);
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
                 Room room = new Room(
-                        data[0],
-                        data[1],
-                        Double.parseDouble(data[2]),
-                        Boolean.parseBoolean(data[3])
+                        resultSet.getString("roomNumber"),
+                        resultSet.getString("type"),
+                        resultSet.getDouble("price"),
+                        resultSet.getInt("availability") == 1
                 );
                 rooms.add(room);
             }
-        } catch (IOException exception) {
-            throw new RuntimeException("Unable to load rooms from file.", exception);
+        } catch (SQLException exception) {
+            throw new RuntimeException("Unable to load rooms from database.", exception);
         }
-    }
 
-    private void createFileIfNeeded() {
-        try {
-            File folder = new File(DATA_FOLDER);
-            if (!folder.exists()) {
-                folder.mkdirs();
-            }
-
-            File roomFile = new File(ROOM_FILE);
-            if (!roomFile.exists()) {
-                roomFile.createNewFile();
-            }
-        } catch (IOException exception) {
-            throw new RuntimeException("Unable to create room file.", exception);
-        }
+        return rooms;
     }
 }

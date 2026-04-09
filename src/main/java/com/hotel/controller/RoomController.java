@@ -89,7 +89,6 @@ public class RoomController {
     }
 
     private void loadRooms() {
-        roomService.loadFromFile();
         roomObservableList.setAll(roomService.getAllRooms());
     }
 
